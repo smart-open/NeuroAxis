@@ -3,7 +3,7 @@ name = "plcagent"
 version = "0.1.0"
 description = "NeuroAxis: PLC development, simulation, verification and knowledge platform"
 requires-python = ">=3.12"
-dependencies = []
+dependencies = ["pydantic>=2.6", "PyYAML>=6.0", "jsonschema>=4.21"]
 
 [project.optional-dependencies]
 dev = ["pytest>=8", "pytest-cov>=5", "ruff>=0.5"]

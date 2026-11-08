@@ -1,0 +1,353 @@
+{
+  "$schema": "http://json-schema.org/draft-2020-12/schema",
+  "title": "NeuroAxis Spec",
+  "type": "object",
+  "required": [
+    "specVersion",
+    "project",
+    "io",
+    "machines"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "specVersion": {
+      "const": "1.0"
+    },
+    "project": {
+      "type": "object",
+      "required": [
+        "id",
+        "name",
+        "scanMs"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "type": "string",
+          "pattern": "^[a-z][a-z0-9-]*$"
+        },
+        "name": {
+          "type": "string",
+          "minLength": 1
+        },
+        "scanMs": {
+          "enum": [
+            1,
+            5,
+            10,
+            20,
+            50
+          ]
+        }
+      }
+    },
+    "io": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "digital": {
+          "$ref": "#/$defs/ioList"
+        },
+        "analog": {
+          "$ref": "#/$defs/ioList"
+        }
+      }
+    },
+    "modes": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "maxItems": 4
+    },
+    "params": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "name",
+          "type",
+          "value"
+        ],
+        "additionalProperties": false,
+        "properties": {
+          "name": {
+            "type": "string",
+            "pattern": "^[A-Z][A-Za-z0-9]*$"
+          },
+          "type": {
+            "enum": [
+              "BOOL",
+              "INT",
+              "DINT",
+              "REAL",
+              "TIME"
+            ]
+          },
+          "value": {},
+          "desc": {
+            "type": "string"
+          },
+          "hmiWritable": {
+            "type": "boolean",
+            "default": true
+          }
+        }
+      }
+    },
+    "machines": {
+      "type": "array",
+      "maxItems": 8,
+      "items": {
+        "type": "object",
+        "required": [
+          "name",
+          "initial",
+          "states",
+          "transitions"
+        ],
+        "additionalProperties": false,
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "initial": {
+            "type": "string"
+          },
+          "states": {
+            "type": "array",
+            "maxItems": 32,
+            "items": {
+              "type": "object",
+              "required": [
+                "name"
+              ],
+              "additionalProperties": false,
+              "properties": {
+                "name": {
+                  "type": "string"
+                },
+                "entry": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/$defs/action"
+                  }
+                }
+              }
+            }
+          },
+          "transitions": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": [
+                "from",
+                "to",
+                "when",
+                "prio"
+              ],
+              "additionalProperties": false,
+              "properties": {
+                "from": {
+                  "type": "string"
+                },
+                "to": {
+                  "type": "string"
+                },
+                "when": {
+                  "type": "string"
+                },
+                "prio": {
+                  "type": "integer",
+                  "minimum": 0
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "sequences": {
+      "type": "array",
+      "maxItems": 16,
+      "items": {
+        "type": "object",
+        "required": [
+          "name",
+          "type",
+          "bind"
+        ],
+        "additionalProperties": false,
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "type": {
+            "enum": [
+              "ExtendRetract",
+              "StartStopHold",
+              "PulseWait"
+            ]
+          },
+          "bind": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "out": {
+                "type": "string"
+              },
+              "ext": {
+                "type": "string"
+              },
+              "ret": {
+                "type": "string"
+              },
+              "timeout": {
+                "type": "string"
+              }
+            }
+          }
+        }
+      }
+    },
+    "interlocks": {
+      "type": "array",
+      "maxItems": 64,
+      "items": {
+        "type": "object",
+        "required": [
+          "when",
+          "then"
+        ],
+        "additionalProperties": false,
+        "properties": {
+          "when": {
+            "type": "string"
+          },
+          "then": {
+            "type": "array",
+            "items": {
+              "$ref": "#/$defs/action"
+            }
+          },
+          "manualOnly": {
+            "type": "boolean",
+            "default": false
+          },
+          "desc": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "compute": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "name",
+          "expr"
+        ],
+        "additionalProperties": false,
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "expr": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "alarms": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "code",
+          "cond",
+          "text",
+          "level"
+        ],
+        "additionalProperties": false,
+        "properties": {
+          "code": {
+            "type": "string",
+            "pattern": "^AL[0-9]{2,4}$"
+          },
+          "cond": {
+            "type": "string"
+          },
+          "text": {
+            "type": "string"
+          },
+          "level": {
+            "enum": [
+              "info",
+              "warn",
+              "fault"
+            ]
+          }
+        }
+      }
+    },
+    "faultReset": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "signal": {
+          "type": "string"
+        },
+        "cond": {
+          "type": "string"
+        }
+      }
+    }
+  },
+  "$defs": {
+    "ioList": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "name",
+          "dir",
+          "addr"
+        ],
+        "additionalProperties": false,
+        "properties": {
+          "name": {
+            "type": "string",
+            "pattern": "^[A-Z][A-Za-z0-9_]*$"
+          },
+          "dir": {
+            "enum": [
+              "in",
+              "out"
+            ]
+          },
+          "addr": {
+            "type": "string",
+            "pattern": "^%(I|Q|IW|QW|ID|QD)[0-9]+(\\.[0-9])?$"
+          },
+          "type": {
+            "enum": [
+              "BOOL",
+              "INT",
+              "DINT",
+              "REAL"
+            ],
+            "default": "BOOL"
+          },
+          "desc": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "action": {
+      "type": "string",
+      "pattern": "^[A-Z][A-Za-z0-9_]*(:=(0|1|TRUE|FALSE|[A-Za-z0-9_.]+))?$"
+    }
+  }
+}
