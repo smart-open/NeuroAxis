@@ -24,9 +24,73 @@
 → 仿真台(确定性软PLC+虚拟设备) → 诊断修复(≤5轮) → 证据包 → 人工批准 → 导出交付
 ```
 
-## 状态
+## 当前实现状态（P0 W1：确定性内核）
 
-设计文档阶段（v2.2 技术栈 Python 化定稿，2026-11-08）。修订记录（v1.0 至今）见 [docs/chapters/98_revision-history.md](docs/chapters/98_revision-history.md)。
+ST 子集解释器 + 虚拟时钟 + 扫描循环 + 轨迹摘要已可运行，验收 A2（同输入 N 次运行轨迹 SHA256 逐字节一致）通过：
+
+```bash
+pip install -e ".[dev]"
+python -m plcagent verify --runs 100    # PASS: trace SHA256 = f3b3ffda...
+python -m plcagent infra                # PG / Redis / RustFS 连通性
+python -m pytest                        # 单元 + API 测试
+```
+
+## 代码结构（前后端分离）
+
+```
+src/plcagent/            后端包（src 布局，测试跑安装后的包）
+├── st/                  ST 语言内核（纯函数，零 IO，禁止 import trace/）
+│   ├── types.py         类型系统：整数回绕、REAL=float32、TIME=1ms、BOOL 严格
+│   ├── lexer.py         词法分析（注释、T# 时间字面量）
+│   ├── ast_nodes.py     冻结 dataclass AST
+│   ├── parser.py        递归下降解析（运算优先级、CASE/FOR/WHILE）
+│   └── interp.py        扫描循环执行器：TON 定时器、S09 循环保护、
+│                        C99 截断除法、仪器化钩子（覆盖/轨迹）
+├── trace/               确定性基础设施
+│   ├── clock.py         VirtualClock（步长白名单 1/5/10/20/50ms）
+│   └── recorder.py      TraceRecorder（轨迹事件 → 规范化 JSON → SHA256）
+├── examples/            典型场景（分拣机 sorter：启动脉冲/光电/急停）
+├── verify.py            验收 A2：N 次运行摘要一致性检查
+├── config.py            基础设施配置（env > config/infra.toml > 默认，向上搜索）
+├── storage/             PostgreSQL / Redis / RustFS 客户端（懒加载驱动）
+├── infra.py             三服务连通性聚合检查
+├── api/                 FastAPI 服务层（依赖 core，core 不感知 HTTP）
+│   ├── schemas.py       Pydantic 请求/响应模型
+│   ├── deps.py          统一错误封装 + 可选 X-API-Key 鉴权
+│   ├── routes.py        /health /infra /verify（薄路由）
+│   └── app.py           ASGI 工厂 + CORS 白名单
+└── cli.py               plcagent verify / infra 命令
+
+web/                     前端（Vue 3 + Vite，仅通过 /api/v1 HTTP 调用后端）
+├── src/api/             axios 客户端（API key 注入、错误统一解包）
+├── src/views/           工作台页面（服务状态/基础设施/验证面板）
+└── vite.config.js       dev 代理 /api → :8000
+
+tests/                   pytest（单元 + API；integration 标记需真实基础设施）
+scripts/                 工具脚本（switch_env.py 环境切换、check_infra.py）
+config/                  infra.toml（密钥，gitignored）/ infra.example.toml（模板）
+docs/                    设计文档（见下）
+```
+
+### 分层铁则
+
+- 依赖方向单向：`api → verify/examples → st/trace`，`st/` 不 import 任何上层。
+- `st/` 内禁止 `time`/`random`——时间只来自 VirtualClock，保证可复现。
+- AST 全部 frozen dataclass；解释器数值语义与 matIEC 对齐（见 docs 15.1）。
+
+## 运行前后端
+
+```bash
+# 后端
+uvicorn plcagent.api.app:app --reload --port 8000
+
+# 前端（另开终端）
+cd web && npm install && npm run dev    # http://localhost:5173，/api 代理到 :8000
+```
+
+可选鉴权：后端设 `PLCAGENT_API_KEY`，前端 `.env.local` 设 `VITE_API_KEY`。
+基础设施凭据：复制 `config/infra.example.toml` 为 `config/infra.toml` 填写；
+双环境切换用 `python scripts/switch_env.py a|b`。
 
 ## 文档导航（5 份顶层文档 + 分章源文件）
 
@@ -45,3 +109,7 @@
 1. **chapters/ 与 5 份顶层文档内容一致**：修改分章文件后，运行 `python scripts/compose_docs.py` 重新生成顶层文档（顶层文档是生成物，不要手改）。
 2. 新增内容先进 chapters/（新章节用下一个可用编号），再同步到对应顶层文档。
 3. 跨文档引用一律写相对链接（如 `../02_技术设计.md`），不写章节号（章节号在拆分后不再唯一）。
+
+## 状态
+
+设计文档阶段（v2.2 技术栈 Python 化定稿，2026-11-08）+ P0 W1 确定性内核已实现。修订记录（v1.0 至今）见 [docs/chapters/98_revision-history.md](docs/chapters/98_revision-history.md)。

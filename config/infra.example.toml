@@ -1,0 +1,33 @@
+# Copy to config/infra.toml (gitignored) and fill in real credentials.
+# Every value can also be overridden via PLCAGENT_* environment variables.
+
+###
+### Environment A: LAN server 192.168.31.210
+###   postgres: postgres / Postgres123!  db=neuroaxis
+###   redis:    Redis123!
+###   rustfs:   keys from server admin
+###
+### Environment B: local VM 192.168.106.128 (VMnet8, currently reachable)
+###   postgres: postgres / abc123
+###   redis:    abc123
+###
+### Switch environments either by editing config/infra.toml or by exporting
+### PLCAGENT_PG_HOST / PLCAGENT_REDIS_HOST / PLCAGENT_RUSTFS_ENDPOINT.
+###
+
+[postgres]
+host = "192.168.31.210"
+port = 5432
+user = "postgres"
+password = "CHANGE_ME"
+database = "neuroaxis"
+
+[redis]
+host = "192.168.31.210"
+port = 6379
+password = "CHANGE_ME"
+
+[rustfs]
+endpoint = "http://192.168.31.210:7000"
+access_key = "CHANGE_ME"
+secret_key = "CHANGE_ME"
