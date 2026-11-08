@@ -1,0 +1,9 @@
+bin/
+obj/
+.vs/
+*.user
+artifacts/
+TestResults/
+*.snk
+secrets*.json
+*.trace.parquet
