@@ -37,6 +37,7 @@ machines:
       - { from: Idle,   to: Move,  when: "Start_PB AND Safety_OK", prio: 1 }
       - { from: Move,   to: Push,  when: "PE_SortPos", prio: 1 }
       - { from: Push,   to: Idle,  when: "Stop_PB OR NOT PE_SortPos", prio: 1 }
+      - { from: Fault,  to: Idle,  when: "Safety_OK", prio: 1 }
 interlocks:
   - { when: "NOT Safety_OK", then: [Conv_Run:=0, Push_Out:=0], desc: safety cut }
 """
@@ -83,6 +84,27 @@ def build_suite() -> dict:
                     {"set": {"Start_PB": False}},
                 ],
                 "assert_never_all": ["Push_Out AND NOT Conv_Run"],
+            },
+            {
+                # G4 coverage: walks the remaining transitions - Fault
+                # recovery writes HMI_Fault:=FALSE, and the item leaving
+                # the sensor drives Push -> Idle (PE falling edge)
+                "id": "recover_and_return",
+                "desc": "estop -> reset -> Idle entry, item passes -> back to Idle",
+                "steps": [
+                    {"set": {"Start_PB": False, "Safety_OK": False}},
+                    {"expect": {"HMI_Fault": True, "withinMs": 100}},
+                    {"set": {"Safety_OK": True}},
+                    {"expect": {"HMI_Fault": False, "withinMs": 100}},
+                    {"set": {"Start_PB": True}},
+                    {"expect": {"Conv_Run": True, "withinMs": 100}},
+                    {"drive": "belt.push_item()"},
+                    {"expect": {"PE_SortPos": True, "afterMs": 4700, "withinMs": 600}},
+                    {"expect": {"Push_Out": True, "withinMs": 200}},
+                    {"expect": {"PE_SortPos": False, "afterMs": 300, "withinMs": 900}},
+                    {"expect": {"Push_Out": False, "withinMs": 200}},
+                    {"set": {"Start_PB": False}},
+                ],
             },
         ],
     }

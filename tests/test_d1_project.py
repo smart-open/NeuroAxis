@@ -39,7 +39,8 @@ def test_d1_generated_st_passes_s_rules():
 def test_d1_suite_all_green():
     result = _run_d1()
     assert result.passed, [(c.case_id, c.failures) for c in result.cases]
-    assert {c.case_id for c in result.cases} == {"estop_immediate", "push_cycle"}
+    assert {c.case_id for c in result.cases} == {
+        "estop_immediate", "push_cycle", "recover_and_return"}
 
 
 def test_d1_deterministic():

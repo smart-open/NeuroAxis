@@ -119,9 +119,12 @@ class Interpreter:
         self.clock.advance()
 
     # -- statements -----------------------------------------------------------
-    def _execute(self, stmts: tuple) -> None:
+    def _execute(self, stmts: tuple, path: str = "") -> None:
         for stmt_id, stmt in enumerate(stmts):
-            self.instrument.on_before_statement(stmt_id)
+            # path-qualified id: nested statements share local indices, so
+            # statement coverage would collapse siblings without the prefix
+            qualified_id = f"{path}{stmt_id}"
+            self.instrument.on_before_statement(qualified_id)
             if isinstance(stmt, Assignment):
                 value = self._eval(stmt.expr)
                 self._assign(stmt.target, value)
@@ -129,34 +132,34 @@ class Interpreter:
                 executed = False
                 for cond, body in stmt.branches:
                     if self._truthy(self._eval(cond)):
-                        self._execute(body)
+                        self._execute(body, f"{qualified_id}.")
                         executed = True
                         break
                 if not executed:
-                    self._execute(stmt.else_body)
+                    self._execute(stmt.else_body, f"{qualified_id}e.")
             elif isinstance(stmt, CaseStatement):
-                self._exec_case(stmt)
+                self._exec_case(stmt, f"{qualified_id}.")
             elif isinstance(stmt, ForStatement):
                 self._exec_for(stmt)
             elif isinstance(stmt, WhileStatement):
                 iterations = 0
                 while self._truthy(self._eval(stmt.cond)):
-                    self._execute(stmt.body)
+                    self._execute(stmt.body, f"{qualified_id}w.")
                     iterations += 1
                     if iterations > 100_000:  # S09 runtime backstop, same as FOR
                         raise SimFault("WHILE loop exceeded 100k iterations (S09)")
             elif isinstance(stmt, ReturnStatement):
                 return
 
-    def _exec_case(self, stmt: CaseStatement) -> None:
+    def _exec_case(self, stmt: CaseStatement, path: str = "") -> None:
         selector = self._eval(stmt.selector)
         if isinstance(selector, bool) or not isinstance(selector, int):
             raise SimFault("CASE selector must be an integer")
-        for arm in stmt.arms:
+        for arm_index, arm in enumerate(stmt.arms):
             if selector in arm.labels:
-                self._execute(arm.body)
+                self._execute(arm.body, f"{path}c{arm_index}.")
                 return
-        self._execute(stmt.else_body)  # empty else executes nothing (15.1)
+        self._execute(stmt.else_body, f"{path}ce.")  # empty else: no-op (15.1)
 
     def _exec_for(self, stmt: ForStatement) -> None:
         var_type = self.env.types[stmt.loop_var]
@@ -166,7 +169,7 @@ class Interpreter:
         iterations = 0
         while (step > 0 and current <= stop) or (step < 0 and current >= stop):
             self.env.values[stmt.loop_var] = current
-            self._execute(stmt.body)
+            self._execute(stmt.body, "for.")
             current = coerce(var_type, current + step)
             iterations += 1
             if iterations > 100_000:  # S09 runtime backstop

@@ -55,6 +55,7 @@ class SuiteResult:
     suite: str
     cases: list[CaseResult] = field(default_factory=list)
     digest: str = ""
+    instruments: list = field(default_factory=list)   # coverage hooks etc.
 
     @property
     def passed(self) -> bool:
@@ -146,14 +147,16 @@ def _require_plant_input(plant: PlantSim, signal: str, case_id: str,
 def run_suite(st_source: str, suite: dict, plant_proto: PlantSim,
               scan_ms: int, max_scans: int = 100000,
               pre_scan: Callable | None = None,
-              post_scan: Callable | None = None) -> SuiteResult:
+              post_scan: Callable | None = None,
+              instrument_factory: Callable | None = None) -> SuiteResult:
     """Run every case; each case gets a fresh interpreter + fresh plant."""
     suite_result = SuiteResult(suite=str(suite.get("suite", "suite")))
     recorder = TraceRecorder()
     for case in suite.get("cases", []):
         suite_result.cases.append(
             _run_case(case, st_source, plant_proto, scan_ms, recorder,
-                      max_scans, pre_scan, post_scan))
+                      max_scans, pre_scan, post_scan, instrument_factory,
+                      suite_result.instruments))
     suite_result.digest = recorder.digest()
     return suite_result
 
@@ -169,12 +172,17 @@ def _fresh_plant(proto: PlantSim) -> PlantSim:
 def _run_case(case: dict, st_source: str, plant_proto: PlantSim,
               scan_ms: int, recorder: TraceRecorder, max_scans: int,
               pre_scan: Callable | None = None,
-              post_scan: Callable | None = None) -> CaseResult:
+              post_scan: Callable | None = None,
+              instrument_factory: Callable | None = None,
+              instruments: list | None = None) -> CaseResult:
     case_id = str(case.get("id", "case"))
     outcome = CaseResult(case_id=case_id)
     clock = VirtualClock(scan_ms=scan_ms)
-    interp = Interpreter(parse_program(st_source), clock,
-                         TraceHook(clock, recorder))
+    instrument = (instrument_factory(clock, recorder)
+                  if instrument_factory else TraceHook(clock, recorder))
+    if instruments is not None:
+        instruments.append(instrument)
+    interp = Interpreter(parse_program(st_source), clock, instrument)
     plant = _fresh_plant(plant_proto)
 
     # declared PLC inputs known up front; init runs before the view exists.
