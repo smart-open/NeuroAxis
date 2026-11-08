@@ -67,30 +67,44 @@ alarms:
 
 **字段口径**：`io.addr` 是 IEC 地址（导出时按方言转换）；`transitions.prio` 小者优先（解决同时满足）；`from: "*"` 表示任意状态；`sequences` 只允许内置模板（P0 三种：`ExtendRetract`、`StartStopHold`、`PulseWait`），模板库随版本扩充并逐一做单元仿真——**模板是确定性的来源，宁可少而硬**。
 
-### 3.3 IR 模型（C# 核心类型）
+### 3.3 IR 模型（Pydantic 核心类型）
 
-```csharp
-// PlcAgent.Ir / Model.cs —— 与 13 号插件契约同风格，纯不可变 record
-public sealed record IrProject(
-    string SpecHash,                       // 溯源: 生成自哪版 Spec
-    string ScanMs,
-    IReadOnlyList<IrIo> Io,
-    IReadOnlyList<IrMachine> Machines,
-    IReadOnlyList<IrSequence> Sequences,
-    IReadOnlyList<IrInterlock> Interlocks,
-    IReadOnlyList<IrCompute> Compute,
-    IReadOnlyList<IrAlarm> Alarms,
-    IReadOnlyList<IrParam> Params);
+```python
+# plcagent/ir/model.py —— Pydantic 不可变模型，与 LLM JSON Schema 同构
+from pydantic import BaseModel, ConfigDict
 
-public sealed record IrMachine(
-    string Name, string InitialState,
-    IReadOnlyList<IrState> States,
-    IReadOnlyList<IrTransition> Transitions);
+Frozen = ConfigDict(frozen=True)   # 不可变，可哈希可 diff
 
-public sealed record IrTransition(
-    string From, string To, IrExpr Guard, int Priority);   // Guard 是语法树,不是字符串!
+class IrExpr(BaseModel):           # AND/OR/NOT/CMP/VAR/LIT
+    model_config = Frozen
+    kind: IrExprKind
+    ...
 
-public sealed record IrExpr(IrExprKind Kind, ...);          // AND/OR/NOT/CMP/VAR/LIT
+class IrTransition(BaseModel):
+    model_config = Frozen
+    from_state: str
+    to_state: str
+    guard: IrExpr                  # Guard 是语法树, 不是字符串!
+    priority: int
+
+class IrMachine(BaseModel):
+    model_config = Frozen
+    name: str
+    initial_state: str
+    states: list[IrState]
+    transitions: list[IrTransition]
+
+class IrProject(BaseModel):
+    model_config = Frozen
+    spec_hash: str                 # 溯源: 生成自哪版 Spec
+    scan_ms: int
+    io: list[IrIo]
+    machines: list[IrMachine]
+    sequences: list[IrSequence]
+    interlocks: list[IrInterlock]
+    compute: list[IrCompute]
+    alarms: list[IrAlarm]
+    params: list[IrParam]
 ```
 
 **关键点：`Guard` 在 IR 里是语法树而非字符串**。Spec 加载时就把表达式解析成树（复用 ST 表达式解析器），这一步就消灭了"LLM 写了个奇怪表达式"的整类问题；语义校验（变量存在、类型匹配、无未定义引用）直接在树上做。

@@ -1,0 +1,13 @@
+docs: 技术栈 Python 化定稿（v2.2~v2.7），平台化定位与基础层三件套
+
+- 产品定位修正为工业智能开发平台（P0 五大能力：PLC 开发/模拟调试/验证门禁/知识库/错误排查）
+- 主技术栈 Python 3.12：LangGraph 编排（P0 即采用，agent.engine 留自研回退）、LlamaIndex 知识库摄取、
+  FastAPI+SSE、Vue 3 工作台、pymodbus/python-snap7（LGPL 子进程隔离）、pyarrow trace、WeasyPrint 证据包
+- 向量库定版 pgvector（19.1a 对比表；Qdrant 为 >500 万片逃生舱）
+- 基础层三件套：PG16（关系+pgvector 一库三用）+ RustFS（S3 兼容对象存储，boto3）+ Redis 7（缓存&队列）
+- 虚拟设备库扩充至 30+ 种（四族：运动传动/气动执行/过程仪表/检测安全）+ ComponentRegistry 注册式扩展
+- 生产可用性修复：9.2 认证与权限、五容器 Docker Compose 部署、Alembic 迁移、
+  服务端密钥管理口径、PyPI attestations + cosign 制品签名、E-REDIS-DOWN/E-RUSTFS-DOWN 降级错误码
+- 新增 docs/architecture-overview.svg 技术架构全景图（六层 + 闸门红线 + 核心闭环）
+- 02 章新增 2.5 全景图与 2.6 技术矩阵（15 项选型 × 许可 × 替代路径）；8 章新增 8.3 存储分层
+- 修订记录 v2.2~v2.7 全程可追溯；顶层文档经 compose_docs.py 重新生成，全库术语扫描 CLEAN

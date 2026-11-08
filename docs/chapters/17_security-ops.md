@@ -3,9 +3,9 @@
 
 | 威胁 | 面 | 缓解 |
 |---|---|---|
-| LLM API key 泄露 | 云通道 | key 只进 DPAPI 加密的用户凭据区（Windows Credential Manager / 环境变量注入），不落 jsonc、不入库、不打日志；服务端模式走 13 号密钥管理 |
+| LLM API key 泄露 | 云通道 | 服务端：key 只经环境变量注入或挂载密钥文件（权限 0600），不落配置文件、不入库、不打日志；可选接入 Vault/13 号密钥管理。Windows 本机 CLI 模式才用 DPAPI（Credential Manager） |
 | 工艺数据外流 | 云 LLM | `redactCloud: true` 默认开：IO 表名/参数名按字典匿名化（Pump_1←主泵）后出网，映射表只在本地；内网场景直接禁云通道 |
 | Prompt 注入 | 用户贴入的工艺文档/OCR | 文档内容包 `<untrusted>` 标记进上下文；工具调用仅白名单；Agent 输出必须过 Schema，注入文本无法变成工具指令 |
 | 生成的 ST 含恶意构造 | 专家模式逃生舱 | S09/S15/S21/S13 硬拦（无循环上界/递归/直接地址/除零）；解释器沙箱（无 IO 外副作用） |
-| trace 泄露知识产权 | 对象存储 | 本地存储 + 可选加密；导出证据包含企业水印开关 |
+| trace 泄露知识产权 | 对象存储（RustFS） | 私有化部署数据不出内网；RustFS 服务端加密（SSE-S3）可选开启；导出证据包含企业水印开关 |
 | 审计篡改 | approval/audit 表 | 复用 13 号 9.7 哈希链（prev_hash 串联），P0 单机也启用 |

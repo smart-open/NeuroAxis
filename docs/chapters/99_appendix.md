@@ -14,7 +14,7 @@ demo-d1/
 
 ```bash
 plcagent new demo-d1 --template conveyor_sorting
-plcagent edit demo-d1/spec.yaml          # 或 Studio
+plcagent edit demo-d1/spec.yaml          # 或 Web 工作台
 plcagent run demo-d1 --kind generate     # 全闭环
 plcagent verify demo-d1 --baseline expected/   # CI 回归
 ```
@@ -35,7 +35,7 @@ plcagent verify demo-d1 --baseline expected/   # CI 回归
 - [OpenPLC（GPLv3，仅作 A 档运行时参考）](https://github.com/thiagoralves/OpenPLC)
 - [matIEC（LGPL，iec2c 编译器）](https://github.com/beremiz/matiec)
 - [Beremiz（开源 IEC IDE 架构参考）](https://industrialmonitordirect.com/blogs/knowledgebase/beremiz-open-source-iec-61131-3-ide-project-status-and-alternatives)
-- [NModbus（MIT）](https://www.nuget.org/packages/NModbus)、[S7NetPlus（MIT）](https://github.com/S7NetPlus/s7netplus)
+- [LangGraph](https://langchain-ai.github.io/langgraph/)、[LlamaIndex](https://www.llamaindex.ai/)、[FastAPI](https://fastapi.tiangolo.com/)、[pymodbus（BSD）](https://pymodbus.readthedocs.io/)、[pyarrow](https://arrow.apache.org/docs/python/)us)
 - [TIA Portal Openness（B 档依赖，需本机 TIA）](https://cloud.tencent.com/developer/article/2702029)
 - 手册内：[13 平台](13_插件化工业软件平台_技术架构与二次开发方案.md)（复用契约）、[02 通信](02_下位机通信实战.md)（驱动与模拟器）、[09 加药](09_项目设计说明书_污水加药联动系统.md)（PID 闭环样例可做 D3）
 
@@ -45,7 +45,7 @@ plcagent verify demo-d1 --baseline expected/   # CI 回归
 
 | 待摘文件 | 摘录内容 | 消费方 |
 |---|---|---|
-| `contracts/13-plugin-manifest.md` | `kind: Copilot` 插件 manifest 格式与加载约定 | Studio 挂接（0.4） |
+| `contracts/13-plugin-manifest.md` | `kind: Copilot` 插件 manifest 格式与加载约定 | Web 工作台挂接（0.4） |
 | `contracts/13-rbac-audit.md` | 9 章 RBAC 权限码表 + 9.7 审计哈希链字段定义 | 双人复核（4.6）、审批链（P1-⑤） |
 | `contracts/02-driver-contract.md` | 驱动契约接口（Modbus/S7 驱动如何注册） | F9 真机对接 |
 | `contracts/13-write-four-gates.md` | 5.6 写四闸定义 | 真机写入四阶段（10.2） |

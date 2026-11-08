@@ -18,7 +18,7 @@ erDiagram
   PROJECT ||--o{ EXPORT_BUNDLE : "交付包"
 ```
 
-### 8.2 核心 DDL（PostgreSQL 16，SQLite 同构降级）
+### 8.2 核心 DDL（PostgreSQL 16；CLI 本地无服务模式才允许 SQLite 同构降级，Web/服务端一律 PG）
 
 ```sql
 CREATE TABLE project (
@@ -96,4 +96,12 @@ CREATE TABLE approval (
 );
 ```
 
-trace 全量数据（每扫描每信号）放对象存储（Parquet，列：scan_no, var, value, stmt_hits），DB 只存摘要——沿用 13 号 7.4 时序数据策略口径：**库里不放大 blob**。
+trace 全量数据（每扫描每信号）放对象存储（RustFS，S3 兼容 API，boto3 客户端访问；Parquet，列：scan_no, var, value, stmt_hits），DB 只存摘要——沿用 13 号 7.4 时序数据策略口径：**库里不放大 blob**。
+
+### 8.3 存储与缓存分层（P0 即启用）
+
+| 层 | 技术 | 用途 | 关键约束 |
+|---|---|---|---|
+| 关系+向量 | PostgreSQL 16（+pgvector） | 工程库/版本链/run/审批/kb 向量 | 唯一事实来源；备份 pg_dump + WAL |
+| 对象存储 | RustFS（S3 兼容） | trace Parquet、证据包 PDF、导出产物、知识库原始文档 | 桶：`trace/`（90 天转冷）、`evidence/`（永久）、`kb-source/`、`exports/`；客户端 boto3，端点可配（切 MinIO/云 S3 零代码改动） |
+| 缓存&队列 | Redis 7 | SSE 事件发布（Pub/Sub）、Agent 任务队列（Arq）、闸门通知、并发行锁的快速路径、评测调度 | Redis 数据**可丢**——全部状态的事实来源在 PG，Redis 只做加速与消息管道；持久化 AOF 可选 |

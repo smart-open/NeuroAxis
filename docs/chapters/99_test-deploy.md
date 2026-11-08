@@ -17,13 +17,13 @@
 
 | 形态 | 部署物 | 安装方式 | 目标环境 |
 |---|---|---|---|
-| P0 单机 | `plcagent` dotnet tool + Studio 安装包 + SimHost exe | dotnet tool install / 双击安装包 | Win10/11 i5/16G，无 GPU 可跑（LLM 走云或小模型） |
-| P1 服务端 | ASP.NET Core + PostgreSQL 16 + 对象存储 + vLLM（可选） | Docker Compose 或 Windows 服务 | 内网服务器；PG 每日 pg_dump + WAL 归档（16.5） |
-| 离线内网 | 全离线包（含本地模型部署说明） | 同上；数据不出厂 | `redactCloud: true`，云通道禁用 |
+| P0 服务器 | FastAPI + LangGraph（Web 工作台 API + 编排）+ PostgreSQL 16 + RustFS + Redis + `plcagent` PyPI 包 | Docker Compose 单机部署（Postgres/RustFS/Redis/API/SimHost 五容器，镜像摘要锁定） | 一台 i5/16G 服务器；工程师浏览器访问；LLM 走云 API（key 只经环境变量注入服务端） |
+| P1 扩展 | + RAG 知识库运营（pgvector 已内置于 PG） | 同上，可加副本 | 多用户 RBAC；PG 每日 pg_dump + WAL 归档（16.5）；RustFS 数据纳入备份 |
+| 离线场景 | 暂不承诺 | — | 本地模型通道 P2 再评估（2.3 章）；强离线客户先引导走临时云通道或排除交付 |
 
 ## 3. 发布流程与兼容承诺（汇总自 16.5）
 
-1. 版本号：SemVer；schema 迁移只增不改（EF Migrations）。
+1. 版本号：SemVer；schema 迁移只增不改（Alembic）。
 2. 旧 trace 因 sidecar 含 productVersion 永可读（15.2 四哈希校验）。
 3. Prompt/模板均版本化；评测集退化可一键回退（14.2）。
 4. 发布前置检查：CI 全绿 + 确定性当日通过 + 评测集无退化。
@@ -34,7 +34,7 @@
 | 码 | 场景 | 恢复策略 |
 |---|---|---|
 | E-SIM-CRASH | SimHost 崩溃/OOM | 自动重启 + 快照续跑；同 run 崩 ≥3 次判 fail |
-| E-LLM-TIMEOUT | 单次 LLM >60s | 重试 2 次（指数退避）→ 降级规则引擎或转人工 |
+| E-LLM-TIMEOUT | 单次 LLM >60s | 重试 2 次（指数退避）→ 切备用供应商（16.2 fallbackEndpoints）→ 降级规则引擎或转人工 |
 | E-LLM-BUDGET | 预算熔断 | run 挂起转人工，产物保留 |
 | E-GATE-TIMEOUT | 闸门 >72h 无响应 | 挂起+提醒；**安全闸门永不超时自动通过** |
 | E-SPEC-CONFLICT | 并发编辑 | 行锁拒绝第二个 run |
@@ -44,6 +44,6 @@
 ## 5. 备份与容量
 
 - DB：每日 pg_dump + WAL 归档，RPO≤5min；恢复演练每季度。
-- trace/产物：对象存储生命周期 90 天转冷存，黄金基线永久。
+- trace/产物：RustFS（S3 兼容）生命周期 90 天转冷存，黄金基线永久。
 - 磁盘：单项目 ≈200MB，20 项目/月 ≈4GB（16.1 容量模型）。
 - SimHost 内存配额 2GB 超限强杀重启。

@@ -39,26 +39,29 @@ stateDiagram-v2
   Export --> [*]
 ```
 
-**轮次预算**：Design↔StaticCheck 3 轮；Debug 5 轮；总 LLM 调用 ≤ 60 次 / RunId，超预算强制升级人工。所有轮次状态落库（见 9 章），Studio 断线重连可恢复。
+**轮次预算**：Design↔StaticCheck 3 轮；Debug 5 轮；总 LLM 调用 ≤ 60 次 / RunId，超预算强制升级人工。所有轮次状态落库（见 9 章），Web 工作台断线重连可恢复。
 
 ### 4.3 工具契约（24 个，节选核心 8 个）
 
-```csharp
-// PlcAgent.Agent/Tools.cs —— 每个工具: 强类型入参出参 + 幂等 + 超时 + 审计
-public interface IAgentTool<TIn, TOut>
-{
-    string Name { get; }                       // "spec.validate"
-    ToolPerm Perm { get; }                     // Read/WriteSpec/RunSim/Export
-    TimeSpan Timeout { get; }
-    Task<TOut> ExecuteAsync(TIn input, ToolContext ctx, CancellationToken ct);
-}
+```python
+# plcagent/agent/tools.py —— 每个工具: Pydantic 强类型入参出参 + 幂等 + 超时 + 审计
+from pydantic import BaseModel
 
-public sealed record TraceSummary(           // Debugger 的眼睛, 不是原始trace
-    string FailingAssertion,
-    int FailScan,                            // 失败发生在第几个扫描
-    IReadOnlyList<SignalEvent> WindowEvents, // 失败前 N=200 扫描内的信号翻转
-    IReadOnlyList<string> ActiveStates,      // 各状态机当前状态
-    IReadOnlyList<string> SuspicionHints);   // 规则引擎给的线索(见4.4)
+class ToolContext(BaseModel):
+    run_id: str
+    perm: ToolPerm                # Read/WriteSpec/RunSim/Export
+
+class AgentTool(Protocol):
+    name: str                     # "spec.validate"
+    timeout_s: float
+    def execute(self, input: BaseModel, ctx: ToolContext) -> BaseModel: ...
+
+class TraceSummary(BaseModel):    # Debugger 的眼睛, 不是原始 trace
+    failing_assertion: str
+    fail_scan: int                # 失败发生在第几个扫描
+    window_events: list[SignalEvent]  # 失败前 N=200 扫描内的信号翻转
+    active_states: list[str]          # 各状态机当前状态
+    suspicion_hints: list[str]        # 规则引擎给的线索(见4.4)
 ```
 
 | 工具 | 作用 | 关键点 |
@@ -117,7 +120,7 @@ public sealed record TraceSummary(           // Debugger 的眼睛, 不是原始
 | 任务 | 具体指令 + 澄清答复 | 1k |
 | 反馈 | TraceSummary（仅 Debugger） | 2k |
 
-超限策略：先砍知识段、再砍项目段到 diff、**永不砍系统段**。温度 0.2；结构化输出强制 JSON Schema 校验，失败重试 2 次后降级规则引擎。
+超限策略：先砍知识段、再砍项目段到 diff、**永不砍系统段**。温度 0.2；结构化输出强制 JSON Schema 校验（云 API 端 json_schema 约束，见 4.7），失败重试 2 次后降级规则引擎。
 
 ### 4.6 人工闸门的两级实现
 
@@ -127,5 +130,14 @@ public sealed record TraceSummary(           // Debugger 的眼睛, 不是原始
 | Gate_Result | 仿真报告（断言/覆盖率/波形）+ ST diff | 同上，批准后解锁导出 |
 
 P0 单人（自审批留痕即可）；P1 接 13 号 RBAC 双人复核（9.6 节）。
+
+### 4.7 LLM 云通道要点（本地通道取消后的实现口径）
+
+| 项 | 口径 |
+|---|---|
+| 供应商 | 主 + 备两家（DeepSeek/Qwen/GLM 等），OpenAI 兼容协议，切换只改 base_url（16.2 fallbackEndpoints） |
+| 结构化输出 | **API 端 JSON Schema 强约束**（response_format/json_schema），不靠提示词；失败重试 2 次后降级规则引擎（4.5） |
+| 脱敏 | 出网前按 17 章字典匿名化，映射表只存服务端 |
+| 记账 | 全部调用进 llm_call 表（token/成本/模型/延迟），预算熔断按 16.3 |
 
 ---

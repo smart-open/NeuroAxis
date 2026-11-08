@@ -1,13 +1,14 @@
-﻿# 灵枢 NeuroAxis
+# 灵枢 NeuroAxis
 
-**通用 PLC + AI 自动化编程 Agent（下位机）**
+**工业智能开发平台：PLC 开发 · 模拟调试 · 验证门禁 · 知识库 · 错误排查**
 
 > 一个"从工艺描述到可运行 PLC 程序"的 AI 工程 Agent——它读需求、写程序、在虚拟设备上把程序跑通、自己找出错在哪并修好，最后交出人和测试证据，人才把程序下到真机。
 
 | 项 | 内容 |
 |---|---|
-| 技术栈 | .NET 8（ASP.NET Core + WPF）+ PostgreSQL 16 + 自研 ST 子集解释器 + matIEC 兼容导出 + 本地/云 LLM 双通道 |
+| 技术栈 | Python 3.12（LangGraph 编排 + LlamaIndex 知识库 + FastAPI/SSE）+ Vue 3 工作台 + PostgreSQL 16（关系+pgvector）+ RustFS 对象存储（S3 兼容）+ Redis（缓存&队列）+ 自研 ST 子集解释器 + matIEC 兼容导出 + 云 LLM API（多供应商切换） |
 | 定位 | 下位机 AI 编程（作为姊妹项目 [SmartDock](https://github.com/smart-open/SmartDock) 上位平台的 `kind: Copilot` 能力插件挂接） |
+| 架构全景图 | docs/architecture-overview.svg（六层技术架构一图总览） |
 | 文档体系 | 5 份顶层文档 + `docs/chapters/` 分章源文件，见下「文档导航」 |
 
 ## 三条铁律
@@ -25,14 +26,14 @@
 
 ## 状态
 
-设计文档阶段（v2.0 文档体系重组，2026-11-08）。修订记录（v1.0 至今）见 [docs/chapters/98_revision-history.md](docs/chapters/98_revision-history.md)。
+设计文档阶段（v2.2 技术栈 Python 化定稿，2026-11-08）。修订记录（v1.0 至今）见 [docs/chapters/98_revision-history.md](docs/chapters/98_revision-history.md)。
 
 ## 文档导航（5 份顶层文档 + 分章源文件）
 
 | # | 文档 | 内容 | 适用读者 |
 |---|---|---|---|
 | 1 | [docs/01_产品需求与验收.md](docs/01_产品需求与验收.md) | 产品定义、品牌定位、目标用户、量化验收指标、里程碑总表、对外交付边界、附录（含外部契约摘录清单） | 决策人/投资人/产品 |
-| 2 | [docs/02_技术设计.md](docs/02_技术设计.md) | 架构、Spec→IR→ST、Agent（24 工具清单）、仿真台、导出、数据、接口、静态检查 40 条、验证体系、互操作、运维与安全、Spec JSON Schema 与 D1 全量样例 | 开发工程师 |
+| 2 | [docs/02_技术设计.md](docs/02_技术设计.md) | 架构（Vue 工作台/FastAPI/LangGraph/云 LLM）、Spec→IR→ST、Agent（24 工具清单）、仿真台、导出、数据、接口、静态检查 40 条、验证体系、互操作、运维与安全、Spec JSON Schema 与 D1 全量样例 | 开发工程师 |
 | 3 | [docs/03_实施计划.md](docs/03_实施计划.md) | P0/P1/P2 周级排期、交付物、依赖与前置条件 | 项目经理/全员 |
 | 4 | [docs/04_阶段验收标准.md](docs/04_阶段验收标准.md) | 每阶段验收清单（含测量方法）、验收物清单、商业交付检查表 | 验收人/QA |
 | 5 | [docs/05_测试与部署.md](docs/05_测试与部署.md) | 测试分层与 CI、部署形态、发布流程、错误处置、备份 | DevOps/QA |
@@ -41,6 +42,6 @@
 
 ### 维护规则
 
-1. **chapters/ 与 5 份顶层文档内容一致**：修改分章文件后，手动同步对应顶层文档（或恢复 `scripts/compose_docs.py` 重新生成，脚本见 git 历史 `9a99698^`）。
+1. **chapters/ 与 5 份顶层文档内容一致**：修改分章文件后，运行 `python scripts/compose_docs.py` 重新生成顶层文档（顶层文档是生成物，不要手改）。
 2. 新增内容先进 chapters/（新章节用下一个可用编号），再同步到对应顶层文档。
 3. 跨文档引用一律写相对链接（如 `../02_技术设计.md`），不写章节号（章节号在拆分后不再唯一）。

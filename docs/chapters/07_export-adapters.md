@@ -9,6 +9,6 @@
 
 三档共用同一份 IR，只是导出器不同。**硬件组态、安全组态永远人工**（这是 B 档的边界，不是缺陷）。
 
-许可证红线（A8）：matIEC 以独立子进程调用、独立目录存放（LGPL 边界）；不静态链接 OpenPLC 运行时；S7NetPlus/NModbus 为 MIT 可放心商用。
+许可证红线（A8）：matIEC 以独立子进程调用、独立目录存放（LGPL 边界）；不静态链接 OpenPLC 运行时；pymodbus（BSD）可放心商用；python-snap7 以子进程隔离 LGPL 边界（同 matIEC 口径）。
 
 ---

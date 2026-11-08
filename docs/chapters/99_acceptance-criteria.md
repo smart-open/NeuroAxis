@@ -18,7 +18,7 @@
 | 6 | 互锁完备性 | 人为删除一条互锁，静态检查必须报错 | 故障注入测试脚本（V3/R01） |
 | 7 | trace 回放一致性 | 回放与原运行逐字节一致 | `plcagent replay --trace x.parquet --from N` 对比哈希 |
 | 8 | 断电重启恢复 | 杀进程重启后 run 状态恢复并续跑 | 手动演练 + 自动化测试 |
-| 9 | SimHost 隔离 | 强杀 SimHost 不丢 Studio 状态 | 手动演练 |
+| 9 | SimHost 隔离 | 强杀 SimHost 不丢 Web/API 状态 | 手动演练 |
 | 10 | LLM 记账 | 全部调用进 llm_call 表（token/成本/模型） | `SELECT count(*) FROM llm_call` 对比网关日志 |
 | 11 | 证据包 | 含 Non-Safety 声明 + 覆盖率 + 波形 + 审批链 | 打开报告逐项检查 |
 | 12 | CLI CI 回归 | `plcagent verify` 退出码 0/2/3 语义正确 + JUnit XML | CI 流水线演示 |
@@ -53,9 +53,9 @@
 
 ## 4. 商业交付前检查（源自 20 章，逐行勾掉）
 
-- [ ] Authenticode 签名 + RFC3161 时间戳（plcagent / Studio / SimHost）
+- [ ] 制品签名 + 摘要锁定：PyPI 包（sigstore/attestations）+ Docker 镜像（cosign）+ RFC3161 时间戳（plcagent / 服务端部署包 / SimHost）
 - [ ] SBOM（SPDX/CycloneDX）随离线包
-- [ ] matIEC LGPL 义务书面确认；QuestPDF 许可边界核对
+- [ ] matIEC LGPL 义务书面确认；python-snap7 LGPL 义务书面确认（子进程隔离口径）
 - [ ] 首次进场登记表（现有程序归属与写权限状态）
 - [ ] 质保条款含模型供应商变更预案（SLA 分级沿用 13 号 P1~P4）
 - [ ] 报价六项拆分合同（License/评测集定制/方言适配/知识库摄取/维护/训练）

@@ -29,43 +29,91 @@
 
 解释器插桩四件套（为覆盖率与 trace 服务，这是"为什么不直接用 OpenPLC"的根因）：
 
-```csharp
-public interface IInstrumentedRunner
-{
-    void OnBeforeStatement(int stmtId);          // 分支/语句覆盖打点
-    void OnVarWrite(string var, IrValue v);      // trace
-    void OnVarRead(string var, IrValue v);
-    int  CurrentScan { get; }                    // 断点/回退用
-}
+```python
+class InstrumentedRunner(Protocol):
+    def on_before_statement(self, stmt_id: int) -> None:
+        """分支/语句覆盖打点"""
+    def on_var_write(self, var: str, value: IrValue) -> None: ...  # trace
+    def on_var_read(self, var: str, value: IrValue) -> None: ...
+    @property
+    def current_scan(self) -> int: ...            # 断点/回退用
 ```
 
-### 5.3 虚拟设备库（P0 12 种，每种 ≤200 行 + 单元测试）
+### 5.3 虚拟设备库（P0 30+ 种，覆盖市面常见设备；每种 ≤200 行 + 单元测试）
+
+**选型口径**：不追求物理精确，追求「行为足够真、参数可标定、故障可注入」。分四族组织，每族一个基类（`BaseComponent`），新设备 = 继承 + 模型函数 + 参数表，目标市面常见离散/过程设备覆盖 ≥80% 中小集成商项目场景。
+
+#### 5.3.1 运动与传动族（8 种）
 
 | 元件 | 输入 | 输出 | 模型 | 关键参数 |
 |---|---|---|---|---|
 | 电机(M带减速器) | Run | running, speed, pos | 一阶速度环 τ=200ms | τ, 额定转速 |
+| 变频器(VFD) | freq_cmd, run | speed, fault | 斜坡加减速+故障字 | 加减速时间, V/f 曲线开关 |
+| 伺服轴 | pos_cmd, enable | in_position, actual_pos, alarm | 三段式(加/匀/减)梯形规划 | 最大速度/加速度, 电子齿轮比 |
+| 步进电机 | pulse, dir | pos | 理想脉冲计数+失步阈值 | 步距角, 失步频率 |
 | 输送线 | motor_on | pe_out(光电), item_at(x) | 质点匀速+队列 | 长度, 速度, 间距 |
-| 气缸 | valve_out | extended, retracted | 双稳态+匀速行程 | 行程ms, 磁开位置 |
-| 泵 | run | flow | 线性流量 | Qmax |
+| 分拣机构 | sort_cmd | sorted_lane, busy | 槽位选择+动作延时 | 槽数, 单件动作ms |
+| 定位平台(XYZ) | axis_cmd×3 | pos×3, home_done | 三轴独立梯形+回零时序 | 行程, 回零方向/偏置 |
+| 机械臂(4轴SCARA) | joint_cmd×4 | joint_pos×4, grip | 各轴梯形+末端夹爪状态 | 臂长, 夹爪开合ms |
+
+#### 5.3.2 气动/执行族（6 种）
+
+| 元件 | 输入 | 输出 | 模型 | 关键参数 |
+|---|---|---|---|---|
+| 气缸(单/双线圈) | valve_out | extended, retracted | 双稳态+匀速行程 | 行程ms, 磁开位置 |
+| 气爪 | open/close | gripped, released | 同气缸+夹持力阈值 | 行程ms, 保持力 |
+| 真空吸盘 | vac_on | vacuum_ok | 抽真空一阶+泄漏 | 抽气时间ms, 泄漏率 |
+| 电磁阀组 | 位选信号 | 各位反馈 | 位态机+换位延时 | 位数, 换位ms |
+| 比例阀 | opening% | flow/pressure | 快开/线性特性 | Cv, 特性曲线 |
+| 顶升/旋转台 | lift_cmd/rot_cmd | lifted/rotated | 同气缸+旋转角度积分 | 行程ms, 旋转ms/90° |
+
+#### 5.3.3 过程/仪表族（10 种）
+
+| 元件 | 输入 | 输出 | 模型 | 关键参数 |
+|---|---|---|---|---|
+| 泵(离心) | run | flow | 线性流量 | Qmax |
+| 泵(计量) | run, stroke% | flow | 线性+脉动 | Qmax, 冲次 |
 | 阀(开关) | open_cmd | opened, closed, pos | 同气缸 | 行程ms |
-| 阀(调节) | opening% | flow | 快开/线性特性 | Cv, 特性 |
+| 阀(调节) | opening% | flow | 快开/线性/等百分比 | Cv, 特性 |
 | 液位罐 | in_flow, out_flow | level, hi, lo, hh, ll | dv/dt=(Qi-Qo)/A | 面积A, 量程 |
-| 压力/温度变送 | 物理量 | 4-20mA 数字值 | 量程线性+噪声 | 量程, 噪声σ |
-| 光电/接近 | 物理遮挡 | bool | 阈值+回差 | 回差 |
-| 编码器 | 轴角 | count | 正交计数 | PPR |
+| 压力/温度/流量变送 | 物理量 | 4-20mA 数字值 | 量程线性+噪声 | 量程, 噪声σ |
+| pH/电导率变送 | 浓度量 | 数字值 | 一阶响应+温度补偿 | 响应τ, 补偿系数 |
 | 加热器 | pwm | temp | 一阶热容 | C, 散热系数 |
+| 搅拌电机 | run, speed_cmd | rpm, torque | 一阶+负载扰动 | τ, 负载系数 |
+| 反应釜(组合件) | 进料阀×n, 搅拌, 加热 | 温度/液位/pH | 罐+加热器+搅拌器组合 | 组合参数 |
+
+#### 5.3.4 检测与安全族（8 种）
+
+| 元件 | 输入 | 输出 | 模型 | 关键参数 |
+|---|---|---|---|---|
+| 光电/接近/磁性开关 | 物理遮挡/位置 | bool | 阈值+回差 | 回差 |
+| 编码器(增量) | 轴角 | count | 正交计数 | PPR |
+| 编码器(绝对) | 轴角 | code | 格雷码/SSI 映射 | 位宽, 单圈/多圈 |
+| 视觉检测(模拟) | trigger | ok/ng, result_code | 可脚本化判结果+延时 | 触发到结果ms |
+| 称重 | 重量 | 数字值 | 一阶+蠕变+噪声 | 量程, 蠕变τ |
+| 条码/RFID 读头 | trigger | code, error | 可脚本化码值+读取延时 | 读码ms, 误码率 |
 | 计数品 | 检测沿 | count | 事件 | — |
+| 安全回路(急停/光栅/门锁) | estop_ok, guard_ok, door | safety_ok | 安全继电器双通道一致性 | 双通道不一致ms |
+
+**设备注册机制**：`ComponentRegistry` 按 `kind` 注册；Spec 的 `plant.components[]` 用 `kind` + `params.yaml` 实例化。**新增设备 = 一个 Python 类 + 一行注册 + 单元测试**，不动解释器和 Runner——这是扩展性的硬要求（P1 开放给用户自定义设备也走同一机制，含沙箱校验）。
 
 **元件接口**：
 
-```csharp
-public interface IPlantComponent
-{
-    void Bind(IoImage io, PlantParams p);   // 与 Spec io.addr 映射
-    void Step(double dt);                   // dt=1ms, 读输出映像→物理演化→写输入映像
-    void Inject(Fault f);                   // 故障注入: 卡死/漂移/断线/恒值
-    PlantSnapshot Snapshot();
-}
+```python
+class PlantComponent(Protocol):
+    def bind(self, io: IoImage, params: PlantParams) -> None:
+        """与 Spec io.addr 映射"""
+    def step(self, dt: float) -> None:
+        """dt=1ms, 读输出映像 → 物理演化 → 写输入映像"""
+    def inject(self, fault: Fault) -> None:
+        """故障注入: 卡死/漂移/断线/恒值"""
+    def snapshot(self) -> PlantSnapshot: ...
+
+# 新设备三步：继承 → 实现 step() → 注册
+@register_component("vacuum_cup")
+class VacuumCup(BaseComponent):
+    params = {"suck_ms": 800, "leak_rate": 0.01}
+    def step(self, dt: float) -> None: ...
 ```
 
 **故障注入矩阵（测试用例的常客）**：卡死在位 / 传感器恒0恒1 / 漂移+10% / 断线(质量位Bad) / 延迟响应 / 噪声增大 / 急停触发 / 扫描超时注入。

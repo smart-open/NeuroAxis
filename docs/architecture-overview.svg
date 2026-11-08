@@ -1,0 +1,248 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="1880" viewBox="0 0 1280 1880" font-family="'Microsoft YaHei','PingFang SC',sans-serif">
+  <defs>
+    <marker id="arrow" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto">
+      <path d="M0,0 L9,3 L0,6 Z" fill="#5b6470"/>
+    </marker>
+    <linearGradient id="hdr" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#1a2f4b"/>
+      <stop offset="1" stop-color="#2c5f8a"/>
+    </linearGradient>
+  </defs>
+  <rect width="1280" height="1880" fill="#f4f6f9"/>
+  <rect x="0" y="0" width="1280" height="86" fill="url(#hdr)"/>
+  <text x="40" y="42" font-size="26" font-weight="bold" fill="#ffffff">灵枢 NeuroAxis · 工业智能开发平台 · 技术架构全景图</text>
+  <text x="40" y="70" font-size="14" fill="#bcd2e8">PLC 开发 · 模拟调试 · 验证门禁 · 知识库 · 错误排查 ｜ Python 3.12 · LangGraph · LlamaIndex · FastAPI · PG16/pgvector · RustFS · Redis · 云 LLM</text>
+  <text x="1240" y="70" font-size="12" fill="#8fb3d4" text-anchor="end">v2.6 · 2026-11-08</text>
+
+  <!-- L5 交互层 -->
+  <rect x="30" y="110" width="1220" height="118" rx="10" fill="#ffffff" stroke="#8ea9c9" stroke-width="1.5"/>
+  <rect x="30" y="110" width="150" height="118" rx="10" fill="#e8f0fa"/>
+  <text x="105" y="160" font-size="16" font-weight="bold" fill="#1a4b8f" text-anchor="middle">L5 交互层</text>
+  <text x="105" y="182" font-size="11" fill="#5b7ba0" text-anchor="middle">浏览器 / 终端</text>
+  <rect x="205" y="128" width="280" height="82" rx="8" fill="#eaf3ff" stroke="#4a90d9"/>
+  <text x="345" y="156" font-size="15" font-weight="bold" fill="#1a4b8f" text-anchor="middle">Web 工作台（Vue 3 + Vite）</text>
+  <text x="345" y="178" font-size="12" fill="#3d5a80" text-anchor="middle">Spec 编辑 · 仿真盯屏 · 闸门审批</text>
+  <text x="345" y="196" font-size="12" fill="#3d5a80" text-anchor="middle">知识库问答 · 错误排查 · ECharts 波形</text>
+  <rect x="515" y="128" width="250" height="82" rx="8" fill="#eaf3ff" stroke="#4a90d9"/>
+  <text x="640" y="156" font-size="15" font-weight="bold" fill="#1a4b8f" text-anchor="middle">plcagent CLI（Python）</text>
+  <text x="640" y="178" font-size="12" fill="#3d5a80" text-anchor="middle">verify --baseline 回归</text>
+  <text x="640" y="196" font-size="12" fill="#3d5a80" text-anchor="middle">--determinism 1000 · CI 一等公民</text>
+  <rect x="795" y="128" width="430" height="82" rx="8" fill="#fdf6e9" stroke="#d9a441"/>
+  <text x="1010" y="156" font-size="15" font-weight="bold" fill="#8a6414" text-anchor="middle">人工闸门（两级）</text>
+  <text x="1010" y="178" font-size="12" fill="#6e5210" text-anchor="middle">Gate_Spec（Spec 评审） · Gate_Result（结果批准）</text>
+  <text x="1010" y="196" font-size="12" fill="#6e5210" text-anchor="middle">安全闸门永不超时通过 · 审批哈希链留痕</text>
+
+  <!-- L4 编排层 -->
+  <rect x="30" y="252" width="1220" height="196" rx="10" fill="#ffffff" stroke="#8ea9c9" stroke-width="1.5"/>
+  <rect x="30" y="252" width="150" height="196" rx="10" fill="#e8f0fa"/>
+  <text x="105" y="330" font-size="16" font-weight="bold" fill="#1a4b8f" text-anchor="middle">L4 编排层</text>
+  <text x="105" y="352" font-size="11" fill="#5b7ba0" text-anchor="middle">Python 3.12</text>
+  <text x="105" y="370" font-size="11" fill="#5b7ba0" text-anchor="middle">LangGraph</text>
+  <rect x="205" y="270" width="330" height="80" rx="8" fill="#eef8ef" stroke="#3f9d5c"/>
+  <text x="370" y="296" font-size="15" font-weight="bold" fill="#1d6b38" text-anchor="middle">LangGraph 主图（6 节点）</text>
+  <text x="370" y="316" font-size="12" fill="#2d6e45" text-anchor="middle">Intake→Clarify→Design→StaticCheck→Simulate→Export</text>
+  <text x="370" y="334" font-size="12" fill="#2d6e45" text-anchor="middle">checkpoint 落 PG · interrupt 人闸 · 时间旅行回放</text>
+  <rect x="205" y="360" width="330" height="72" rx="8" fill="#eef8ef" stroke="#3f9d5c"/>
+  <text x="370" y="386" font-size="14" font-weight="bold" fill="#1d6b38" text-anchor="middle">三个子图（同图承载）</text>
+  <text x="370" y="406" font-size="12" fill="#2d6e45" text-anchor="middle">Debug 归因子图 · 知识库问答 · 错误排障</text>
+  <text x="370" y="422" font-size="11" fill="#5a8a68" text-anchor="middle">回退开关 agent.engine: builtin（自研状态机）</text>
+  <rect x="565" y="270" width="280" height="162" rx="8" fill="#fdf0ef" stroke="#c0392b" stroke-width="1.5"/>
+  <text x="705" y="296" font-size="15" font-weight="bold" fill="#8f2418" text-anchor="middle">闸门服务 G1~G5（图外硬编码）</text>
+  <text x="705" y="318" font-size="12" fill="#7a2d20" text-anchor="middle">G1 编译 · G2 静态(40条) · G3 仿真</text>
+  <text x="705" y="336" font-size="12" fill="#7a2d20" text-anchor="middle">G4 覆盖率 · G5 变异(≥80% 杀死)</text>
+  <text x="705" y="358" font-size="12" fill="#7a2d20" text-anchor="middle">append-only · 结果不可被 Agent 修改</text>
+  <text x="705" y="380" font-size="12" font-weight="bold" fill="#c0392b" text-anchor="middle">框架是员工，不是老板</text>
+  <text x="705" y="402" font-size="11" fill="#a05045" text-anchor="middle">图节点只能"请求进入下一节点"</text>
+  <rect x="875" y="270" width="350" height="162" rx="8" fill="#f4effb" stroke="#7d5ba6"/>
+  <text x="1050" y="296" font-size="15" font-weight="bold" fill="#4d3270" text-anchor="middle">工具网关 · 24 个 Python 工具</text>
+  <text x="1050" y="318" font-size="12" fill="#4d3270" text-anchor="middle">6 角色：Clarifier / Specifier / Designer</text>
+  <text x="1050" y="336" font-size="12" fill="#4d3270" text-anchor="middle">Coder / Debugger / Reporter</text>
+  <text x="1050" y="358" font-size="12" fill="#4d3270" text-anchor="middle">spec.validate · ir.check · gen.render · sta.check</text>
+  <text x="1050" y="376" font-size="12" fill="#4d3270" text-anchor="middle">trace.summarize · sim.replay · kb.search 等</text>
+  <text x="1050" y="400" font-size="11" fill="#7a6890" text-anchor="middle">Pydantic 强类型 + 幂等 + 超时 + 审计</text>
+  <text x="1050" y="418" font-size="11" fill="#7a6890" text-anchor="middle">角色权限矩阵硬编码，Prompt 改不了</text>
+
+  <!-- L3 工程内核 -->
+  <rect x="30" y="472" width="1220" height="150" rx="10" fill="#ffffff" stroke="#8ea9c9" stroke-width="1.5"/>
+  <rect x="30" y="472" width="150" height="150" rx="10" fill="#e8f0fa"/>
+  <text x="105" y="530" font-size="16" font-weight="bold" fill="#1a4b8f" text-anchor="middle">L3 工程内核</text>
+  <text x="105" y="552" font-size="11" fill="#5b7ba0" text-anchor="middle">确定性流水线</text>
+  <text x="105" y="570" font-size="11" fill="#5b7ba0" text-anchor="middle">LLM 不直写交付物</text>
+  <rect x="205" y="492" width="220" height="110" rx="8" fill="#eaf3ff" stroke="#4a90d9"/>
+  <text x="315" y="518" font-size="14" font-weight="bold" fill="#1a4b8f" text-anchor="middle">Spec 引擎（YAML）</text>
+  <text x="315" y="538" font-size="11.5" fill="#3d5a80" text-anchor="middle">JSON Schema 校验 + V1~V16</text>
+  <text x="315" y="556" font-size="11.5" fill="#3d5a80" text-anchor="middle">表达式→IR 语法树（非字符串）</text>
+  <text x="315" y="574" font-size="11.5" fill="#3d5a80" text-anchor="middle">人读写的唯一交付层</text>
+  <text x="440" y="552" font-size="18" fill="#5b6470" text-anchor="middle">→</text>
+  <rect x="455" y="492" width="220" height="110" rx="8" fill="#eaf3ff" stroke="#4a90d9"/>
+  <text x="565" y="518" font-size="14" font-weight="bold" fill="#1a4b8f" text-anchor="middle">IR 引擎（Pydantic）</text>
+  <text x="565" y="538" font-size="11.5" fill="#3d5a80" text-anchor="middle">不可变模型 · 可 hash 可 diff</text>
+  <text x="565" y="556" font-size="11.5" fill="#3d5a80" text-anchor="middle">语义校验 16 条 · 资源上限</text>
+  <text x="565" y="574" font-size="11.5" fill="#3d5a80" text-anchor="middle">IR diff = 程序 diff</text>
+  <text x="690" y="552" font-size="18" fill="#5b6470" text-anchor="middle">→</text>
+  <rect x="705" y="492" width="220" height="110" rx="8" fill="#eaf3ff" stroke="#4a90d9"/>
+  <text x="815" y="518" font-size="14" font-weight="bold" fill="#1a4b8f" text-anchor="middle">ST 生成器（模板）</text>
+  <text x="815" y="538" font-size="11.5" fill="#3d5a80" text-anchor="middle">纯函数：同 IR 恒同输出</text>
+  <text x="815" y="556" font-size="11.5" fill="#3d5a80" text-anchor="middle">手自动/急停/互锁兜底模板</text>
+  <text x="815" y="574" font-size="11.5" fill="#3d5a80" text-anchor="middle">文件头带 SpecHash 可溯源</text>
+  <text x="940" y="552" font-size="18" fill="#5b6470" text-anchor="middle">→</text>
+  <rect x="955" y="492" width="270" height="110" rx="8" fill="#fdf0ef" stroke="#c0392b"/>
+  <text x="1090" y="518" font-size="14" font-weight="bold" fill="#8f2418" text-anchor="middle">静态检查器（40 条）</text>
+  <text x="1090" y="538" font-size="11.5" fill="#7a2d20" text-anchor="middle">S 系列(ST) + R 系列(IR/ST)</text>
+  <text x="1090" y="556" font-size="11.5" fill="#7a2d20" text-anchor="middle">安全规则 ⛨ 14 条不可关闭</text>
+  <text x="1090" y="574" font-size="11.5" fill="#7a2d20" text-anchor="middle">规则自身变异测试（防摆设）</text>
+
+  <!-- L2 仿真台 -->
+  <rect x="30" y="646" width="1220" height="200" rx="10" fill="#ffffff" stroke="#8ea9c9" stroke-width="1.5"/>
+  <rect x="30" y="646" width="150" height="200" rx="10" fill="#e8f0fa"/>
+  <text x="105" y="726" font-size="16" font-weight="bold" fill="#1a4b8f" text-anchor="middle">L2 仿真台</text>
+  <text x="105" y="748" font-size="11" fill="#5b7ba0" text-anchor="middle">SimHost 独立进程</text>
+  <text x="105" y="766" font-size="11" fill="#5b7ba0" text-anchor="middle">产品的护城河</text>
+  <rect x="205" y="666" width="290" height="160" rx="8" fill="#eef8f8" stroke="#2f8f8f"/>
+  <text x="350" y="692" font-size="14" font-weight="bold" fill="#1a5f5f" text-anchor="middle">确定性软 PLC 解释器</text>
+  <text x="350" y="712" font-size="11.5" fill="#2d6e6e" text-anchor="middle">虚拟时钟 = scanNo × scanMs（解耦墙钟）</text>
+  <text x="350" y="730" font-size="11.5" fill="#2d6e6e" text-anchor="middle">ST 子集 + TON/CTU/PID 等标准 FB</text>
+  <text x="350" y="748" font-size="11.5" fill="#2d6e6e" text-anchor="middle">插桩四件套（覆盖/trace/断点/回放）</text>
+  <text x="350" y="770" font-size="12" font-weight="bold" fill="#1a5f5f" text-anchor="middle">验收 A2：1000 次运行</text>
+  <text x="350" y="788" font-size="12" font-weight="bold" fill="#1a5f5f" text-anchor="middle">trace SHA256 全等</text>
+  <text x="350" y="808" font-size="11" fill="#5a8a8a" text-anchor="middle">种子 = hash(SpecHash, RunId, caseId)</text>
+  <rect x="525" y="666" width="380" height="160" rx="8" fill="#eef8f8" stroke="#2f8f8f"/>
+  <text x="715" y="692" font-size="14" font-weight="bold" fill="#1a5f5f" text-anchor="middle">虚拟设备库（30+ 种 · 四族 · 注册式扩展）</text>
+  <text x="715" y="716" font-size="12" fill="#2d6e6e" text-anchor="middle">运动传动(8)：电机/VFD/伺服/步进/输送/分拣/XYZ/SCARA</text>
+  <text x="715" y="736" font-size="12" fill="#2d6e6e" text-anchor="middle">气动执行(6)：气缸/气爪/真空吸盘/阀组/比例阀/顶升台</text>
+  <text x="715" y="756" font-size="12" fill="#2d6e6e" text-anchor="middle">过程仪表(10)：泵×2/阀×2/液位罐/变送/pH/加热/搅拌/反应釜</text>
+  <text x="715" y="776" font-size="12" fill="#2d6e6e" text-anchor="middle">检测安全(8)：光电/编码×2/视觉/称重/RFID/计数/安全回路</text>
+  <text x="715" y="802" font-size="11" fill="#5a8a8a" text-anchor="middle">ComponentRegistry：新设备 = 一个类 + 一行注册 + 单测</text>
+  <rect x="935" y="666" width="290" height="160" rx="8" fill="#eef8f8" stroke="#2f8f8f"/>
+  <text x="1080" y="692" font-size="14" font-weight="bold" fill="#1a5f5f" text-anchor="middle">测试 DSL Runner + trace</text>
+  <text x="1080" y="714" font-size="11.5" fill="#2d6e6e" text-anchor="middle">set/expect/assert_never/expect_seq</text>
+  <text x="1080" y="732" font-size="11.5" fill="#2d6e6e" text-anchor="middle">drive/inject/init · 虚拟时钟断言</text>
+  <text x="1080" y="754" font-size="11.5" fill="#2d6e6e" text-anchor="middle">故障注入：卡死/漂移/断线/延迟/噪声</text>
+  <text x="1080" y="776" font-size="11.5" fill="#2d6e6e" text-anchor="middle">trace → Parquet(pyarrow) + 四哈希 sidecar</text>
+  <text x="1080" y="798" font-size="11.5" fill="#2d6e6e" text-anchor="middle">覆盖率五维：语句/分支/状态/转移/IO</text>
+  <text x="1080" y="816" font-size="11" fill="#5a8a8a" text-anchor="middle">断电快照续跑 · 断点回退重放</text>
+
+  <!-- L2b 诊断闭环 -->
+  <rect x="30" y="870" width="1220" height="86" rx="10" fill="#fffbea" stroke="#d9a441" stroke-width="1.5"/>
+  <text x="105" y="905" font-size="15" font-weight="bold" fill="#8a6414" text-anchor="middle">L2b 诊断闭环</text>
+  <text x="105" y="927" font-size="11" fill="#a3812e" text-anchor="middle">最值钱的一段</text>
+  <text x="290" y="908" font-size="13" fill="#6e5210">仿真失败 → trace.summarize（窗口 200 扫描） → D1~D8 归因规则（先规则后 LLM） → LLM 归因（可解释）</text>
+  <text x="290" y="932" font-size="13" fill="#6e5210">→ ir.patch 出 Spec 修改提案（人工可见可拒） → V1~V16 校验 → 重新生成 → 回归全量用例 · ≤5 轮不收敛升级人工</text>
+
+  <!-- L1 服务交付 -->
+  <rect x="30" y="980" width="1220" height="130" rx="10" fill="#ffffff" stroke="#8ea9c9" stroke-width="1.5"/>
+  <rect x="30" y="980" width="150" height="130" rx="10" fill="#e8f0fa"/>
+  <text x="105" y="1038" font-size="16" font-weight="bold" fill="#1a4b8f" text-anchor="middle">L1 服务交付</text>
+  <text x="105" y="1060" font-size="11" fill="#5b7ba0" text-anchor="middle">FastAPI + SSE</text>
+  <rect x="205" y="998" width="250" height="94" rx="8" fill="#eaf3ff" stroke="#4a90d9"/>
+  <text x="330" y="1024" font-size="14" font-weight="bold" fill="#1a4b8f" text-anchor="middle">FastAPI + SSE</text>
+  <text x="330" y="1044" font-size="11.5" fill="#3d5a80" text-anchor="middle">REST（Idempotency-Key 幂等）</text>
+  <text x="330" y="1062" font-size="11.5" fill="#3d5a80" text-anchor="middle">/runs/{id}/events 事件流</text>
+  <text x="330" y="1080" font-size="11.5" fill="#3d5a80" text-anchor="middle">认证：Session + CSRF（9.2）</text>
+  <rect x="485" y="998" width="240" height="94" rx="8" fill="#eaf3ff" stroke="#4a90d9"/>
+  <text x="605" y="1024" font-size="14" font-weight="bold" fill="#1a4b8f" text-anchor="middle">导出器（A/B/C 三档）</text>
+  <text x="605" y="1044" font-size="11.5" fill="#3d5a80" text-anchor="middle">ST / PLCopen XML / 方言映射</text>
+  <text x="605" y="1062" font-size="11.5" fill="#3d5a80" text-anchor="middle">matIEC 子进程（LGPL 隔离）</text>
+  <text x="605" y="1080" font-size="11.5" fill="#3d5a80" text-anchor="middle">真机写入永远人工闸门</text>
+  <rect x="755" y="998" width="220" height="94" rx="8" fill="#eaf3ff" stroke="#4a90d9"/>
+  <text x="865" y="1024" font-size="14" font-weight="bold" fill="#1a4b8f" text-anchor="middle">证据包（WeasyPrint）</text>
+  <text x="865" y="1044" font-size="11.5" fill="#3d5a80" text-anchor="middle">Non-Safety 声明 + 覆盖率</text>
+  <text x="865" y="1062" font-size="11.5" fill="#3d5a80" text-anchor="middle">波形 + 审批链 + mermaid 图</text>
+  <text x="865" y="1080" font-size="11.5" fill="#3d5a80" text-anchor="middle">回归 trace 哈希校验</text>
+  <rect x="1005" y="998" width="220" height="94" rx="8" fill="#eaf3ff" stroke="#4a90d9"/>
+  <text x="1115" y="1024" font-size="14" font-weight="bold" fill="#1a4b8f" text-anchor="middle">真机对接（P1）</text>
+  <text x="1115" y="1044" font-size="11.5" fill="#3d5a80" text-anchor="middle">pymodbus（BSD）</text>
+  <text x="1115" y="1062" font-size="11.5" fill="#3d5a80" text-anchor="middle">python-snap7 影子只读</text>
+  <text x="1115" y="1080" font-size="11.5" fill="#3d5a80" text-anchor="middle">四阶段推进 · 每阶段人放行</text>
+
+  <!-- L0 基础层 -->
+  <rect x="30" y="1134" width="1220" height="176" rx="10" fill="#ffffff" stroke="#8ea9c9" stroke-width="1.5"/>
+  <rect x="30" y="1134" width="150" height="176" rx="10" fill="#e8f0fa"/>
+  <text x="105" y="1204" font-size="16" font-weight="bold" fill="#1a4b8f" text-anchor="middle">L0 基础层</text>
+  <text x="105" y="1226" font-size="11" fill="#5b7ba0" text-anchor="middle">PG 一库三用</text>
+  <text x="105" y="1244" font-size="11" fill="#5b7ba0" text-anchor="middle">事实唯一来源</text>
+  <rect x="205" y="1154" width="300" height="136" rx="8" fill="#eef8ef" stroke="#3f9d5c" stroke-width="1.5"/>
+  <text x="355" y="1180" font-size="15" font-weight="bold" fill="#1d6b38" text-anchor="middle">PostgreSQL 16（+pgvector）</text>
+  <text x="355" y="1202" font-size="12" fill="#2d6e45" text-anchor="middle">关系：工程/版本链/run/审批/审计哈希链</text>
+  <text x="355" y="1222" font-size="12" fill="#2d6e45" text-anchor="middle">JSONB：Spec/IR 文档</text>
+  <text x="355" y="1242" font-size="12" fill="#2d6e45" text-anchor="middle">向量：kb_chunk（HNSW）+ FTS 混合检索</text>
+  <text x="355" y="1262" font-size="12" fill="#2d6e45" text-anchor="middle">LangGraph checkpoint（schema lg_）</text>
+  <text x="355" y="1282" font-size="11" fill="#5a8a68" text-anchor="middle">备份：pg_dump 每日 + WAL 归档 RPO≤5min</text>
+  <rect x="535" y="1154" width="300" height="136" rx="8" fill="#fdf6e9" stroke="#d9a441" stroke-width="1.5"/>
+  <text x="685" y="1180" font-size="15" font-weight="bold" fill="#8a6414" text-anchor="middle">RustFS（S3 兼容对象存储）</text>
+  <text x="685" y="1202" font-size="12" fill="#6e5210" text-anchor="middle">boto3 标准客户端 · Apache 2.0</text>
+  <text x="685" y="1222" font-size="12" fill="#6e5210" text-anchor="middle">trace/（90天转冷） · evidence/（永久）</text>
+  <text x="685" y="1242" font-size="12" fill="#6e5210" text-anchor="middle">kb-source/ · exports/</text>
+  <text x="685" y="1262" font-size="11" fill="#a3812e" text-anchor="middle">切换 MinIO/Ceph/云 S3 = 改端点零代码</text>
+  <text x="685" y="1282" font-size="11" fill="#a3812e" text-anchor="middle">宕机 → 新仿真挂起，历史只读</text>
+  <rect x="865" y="1154" width="360" height="136" rx="8" fill="#fdf0ef" stroke="#c0392b" stroke-width="1.5"/>
+  <text x="1045" y="1180" font-size="15" font-weight="bold" fill="#8f2418" text-anchor="middle">Redis 7（缓存 &amp; 队列）</text>
+  <text x="1045" y="1202" font-size="12" fill="#7a2d20" text-anchor="middle">SSE 事件总线（Pub/Sub 多实例推送）</text>
+  <text x="1045" y="1222" font-size="12" fill="#7a2d20" text-anchor="middle">任务队列（Arq）· 闸门通知 · 评测调度</text>
+  <text x="1045" y="1242" font-size="12" fill="#7a2d20" text-anchor="middle">并发行锁快速路径</text>
+  <text x="1045" y="1262" font-size="12" font-weight="bold" fill="#c0392b" text-anchor="middle">数据可丢：事实源在 PG</text>
+  <text x="1045" y="1282" font-size="11" fill="#a05045" text-anchor="middle">宕机 → SSE 降级轮询 · 队列暂停不丢 run</text>
+
+  <!-- 知识库 RAG -->
+  <rect x="30" y="1334" width="1220" height="150" rx="10" fill="#ffffff" stroke="#7d5ba6" stroke-width="1.5"/>
+  <rect x="30" y="1334" width="150" height="150" rx="10" fill="#f4effb"/>
+  <text x="105" y="1398" font-size="16" font-weight="bold" fill="#4d3270" text-anchor="middle">知识库 RAG</text>
+  <text x="105" y="1420" font-size="11" fill="#7a6890" text-anchor="middle">LlamaIndex</text>
+  <rect x="205" y="1352" width="270" height="114" rx="8" fill="#f4effb" stroke="#7d5ba6"/>
+  <text x="340" y="1376" font-size="13" font-weight="bold" fill="#4d3270" text-anchor="middle">三层语料</text>
+  <text x="340" y="1396" font-size="11.5" fill="#4d3270" text-anchor="middle">K1 规范库（自编摘要，版权安全）</text>
+  <text x="340" y="1414" font-size="11.5" fill="#4d3270" text-anchor="middle">K2 厂商库（用户自备 PDF）</text>
+  <text x="340" y="1432" font-size="11.5" fill="#4d3270" text-anchor="middle">K3 项目库（只入人批准版）</text>
+  <text x="340" y="1452" font-size="11" fill="#7a6890" text-anchor="middle">contentHash 软删 · 引用可点开原文</text>
+  <text x="490" y="1410" font-size="18" fill="#5b6470" text-anchor="middle">→</text>
+  <rect x="505" y="1352" width="250" height="114" rx="8" fill="#f4effb" stroke="#7d5ba6"/>
+  <text x="630" y="1376" font-size="13" font-weight="bold" fill="#4d3270" text-anchor="middle">摄取管线</text>
+  <text x="630" y="1396" font-size="11.5" fill="#4d3270" text-anchor="middle">LlamaIndex：PDF 解析/切片/元数据</text>
+  <text x="630" y="1414" font-size="11.5" fill="#4d3270" text-anchor="middle">300~800 字/片 · 表格保结构</text>
+  <text x="630" y="1432" font-size="11.5" fill="#4d3270" text-anchor="middle">云 Embedding（版本记元数据）</text>
+  <text x="630" y="1452" font-size="11" fill="#7a6890" text-anchor="middle">换模型 → 全量重嵌（审计红线）</text>
+  <text x="770" y="1410" font-size="18" fill="#5b6470" text-anchor="middle">→</text>
+  <rect x="785" y="1352" width="230" height="114" rx="8" fill="#f4effb" stroke="#7d5ba6"/>
+  <text x="900" y="1376" font-size="13" font-weight="bold" fill="#4d3270" text-anchor="middle">混合检索（同一条 SQL）</text>
+  <text x="900" y="1396" font-size="11.5" fill="#4d3270" text-anchor="middle">pgvector top20 ∪ FTS top20</text>
+  <text x="900" y="1414" font-size="11.5" fill="#4d3270" text-anchor="middle">RRF 融合 top10 → LLM listwise top5</text>
+  <text x="900" y="1432" font-size="11.5" fill="#4d3270" text-anchor="middle">layer 权限 + 版本过滤</text>
+  <text x="900" y="1452" font-size="11" fill="#7a6890" text-anchor="middle">recall@5 ≥ 0.8 进 CI（每日）</text>
+  <text x="1030" y="1410" font-size="18" fill="#5b6470" text-anchor="middle">→</text>
+  <rect x="1045" y="1352" width="180" height="114" rx="8" fill="#fdf0ef" stroke="#c0392b"/>
+  <text x="1135" y="1376" font-size="13" font-weight="bold" fill="#8f2418" text-anchor="middle">强制引用</text>
+  <text x="1135" y="1396" font-size="11.5" fill="#7a2d20" text-anchor="middle">厂商事实必带 [docId#section]</text>
+  <text x="1135" y="1414" font-size="11.5" fill="#7a2d20" text-anchor="middle">无命中答"知识库无依据"</text>
+  <text x="1135" y="1432" font-size="11.5" fill="#7a2d20" text-anchor="middle">禁止参数知识补事实</text>
+  <text x="1135" y="1452" font-size="11" fill="#a05045" text-anchor="middle">P2 验收：引用率 100%</text>
+
+  <!-- LLM 云通道 -->
+  <rect x="30" y="1508" width="600" height="120" rx="10" fill="#ffffff" stroke="#8ea9c9" stroke-width="1.5"/>
+  <text x="60" y="1538" font-size="15" font-weight="bold" fill="#1a4b8f">LLM 云通道（网关统一，多供应商）</text>
+  <rect x="60" y="1552" width="150" height="58" rx="6" fill="#eaf3ff" stroke="#4a90d9"/>
+  <text x="135" y="1576" font-size="12" fill="#1a4b8f" text-anchor="middle">DeepSeek（主）</text>
+  <text x="135" y="1594" font-size="11" fill="#3d5a80" text-anchor="middle">OpenAI 兼容</text>
+  <rect x="225" y="1552" width="150" height="58" rx="6" fill="#eaf3ff" stroke="#4a90d9"/>
+  <text x="300" y="1576" font-size="12" fill="#1a4b8f" text-anchor="middle">Qwen（备1）</text>
+  <text x="300" y="1594" font-size="11" fill="#3d5a80" text-anchor="middle">fallback 自动切换</text>
+  <rect x="390" y="1552" width="150" height="58" rx="6" fill="#eaf3ff" stroke="#4a90d9"/>
+  <text x="465" y="1576" font-size="12" fill="#1a4b8f" text-anchor="middle">GLM（备2）</text>
+  <text x="465" y="1594" font-size="11" fill="#3d5a80" text-anchor="middle">预算熔断 ≤¥5/run</text>
+  <text x="560" y="1576" font-size="11" fill="#5b7ba0">限流 10 req/s</text>
+  <text x="560" y="1594" font-size="11" fill="#5b7ba0">出网默认脱敏</text>
+  <text x="60" y="1624" font-size="11" fill="#5b7ba0">结构化输出：API 端 JSON Schema 强约束（不靠提示词） · 重试 2 次 → 降级规则引擎 · key 环境变量注入不落盘</text>
+
+  <!-- 可观测 -->
+  <rect x="650" y="1508" width="600" height="120" rx="10" fill="#ffffff" stroke="#8ea9c9" stroke-width="1.5"/>
+  <text x="680" y="1538" font-size="15" font-weight="bold" fill="#1a4b8f">可观测 &amp; 治理</text>
+  <text x="680" y="1562" font-size="12" fill="#3d5a80">structlog 结构化日志 · OpenTelemetry 全链路（RunId = trace 根）</text>
+  <text x="680" y="1584" font-size="12" fill="#3d5a80">错误码体系：E-SIM-CRASH / E-LLM-* / E-GATE-TIMEOUT / E-REDIS-DOWN / E-RUSTFS-DOWN</text>
+  <text x="680" y="1606" font-size="12" fill="#3d5a80">评测集 20 题每日跑 · 退化 &gt;5pp 冻结发版 · 每周五 1.3 指标全量</text>
+  <text x="680" y="1628" font-size="12" fill="#3d5a80">审计哈希链（approval/audit） · Prompt/模板版本化一键回退</text>
+
+  <!-- 底部闭环 -->
+  <rect x="30" y="1652" width="1220" height="90" rx="10" fill="#1a2f4b"/>
+  <text x="640" y="1684" font-size="15" font-weight="bold" fill="#ffffff" text-anchor="middle">核 心 闭 环</text>
+  <text x="640" y="1716" font-size="13.5" fill="#bcd2e8" text-anchor="middle">工艺描述 → Agent 澄清+Spec → 人工评审 → IR→ST → 静态检查(40条) → 仿真台(确定性+虚拟设备) → 诊断修复(≤5轮) → 证据包 → 人工批准 → 导出交付</text>
+  <text x="640" y="1734" font-size="11" fill="#8fb3d4" text-anchor="middle">三条铁律：LLM 不直写交付物 · 仿真台是测试台不是演示 · 真机写入永远人工闸门</text>
+</svg>
