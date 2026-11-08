@@ -15,7 +15,7 @@
 |---|---|---|---|
 | W1 | 确定性内核 | ① ST 子集解释器骨架（类型/语句/TON 语义按 15.1 判定表）；② 虚拟时钟 + 扫描循环 + trace 落盘（15.2 Parquet schema）；③ 1000 次一致性测试进 CI ✅ | 第一优先级。解释器语义错 = 全线返工 |
 | W2 | 工程模型上半 | ① Spec JSON Schema（V1~V16 中 schema 能表达的先做）；② Spec 加载/校验/版本链（8.2 DDL）；③ 表达式解析成 IR 语法树（Guard 非字符串）✅ | Schema 是 Spec 引擎第一块代码 |
-| W3 | 工程模型下半 | ① IR→ST 生成器（3.4 五个 POU 模板，含手自动/急停/互锁兜底）；② 静态检查器第一批规则：S01~S03、S11、S21 + 全部 R 系列（13.4 安全类不可关闭） | R03/R04 需要 ST 控制流图 |
+| W3 | 工程模型下半 | ① IR→ST 生成器（PRG_Main 组合程序 + GVL/FB_Machine/PRG_Alarm 导出层；手自动/急停通配边/互锁兜底 R03 后置；SpecHash 头可追溯）✅ ② 静态检查器第一批规则：S01~S03、S11、S21 + R01/R02/R11（13.4 安全类不可关闭）✅；场景链路已升级为 Spec→生成 ST→仿真（06 文档 2b 节）✅ | R03/R04 需要 ST 控制流图；S02/S03/S11 行号待 W4 解析器位置信息；FB 调用与序列模板待 W4 |
 | W4 | 仿真台 | ① 虚拟设备库 ≥30 种（5.3 四族：运动传动/气动执行/过程仪表/检测安全，每种 ≤200 行 + 单测，注册式扩展机制）；② 测试 DSL Runner（set/expect/assert_never/expect_seq/drive/inject/init）；③ D1 样例工程全量文件（spec.yaml + plant/params.yaml + suite.yaml + 黄金基线） | 用例/SortTimeOut/plant 参数三处同源校验（5.4） |
 | W5 | Agent 闭环 | ① Orchestrator 状态机（4.2）；② 工具契约 24 个（4.3）先行实现核心 8 个；③ Debugger 归因规则 D1~D8 + trace.summarize；④ LLM 网关（云 API/记账/预算熔断/多供应商 fallback） | 轮次预算与闸门语义硬编码 |
 | W6 | 收口与验收 | ① 五道闸门 G1~G5 全通（14.1）；② 证据包（WeasyPrint）；③ Web 工作台核心页（工程列表/Spec 编辑/仿真报告/闸门审批）+ CLI；④ 评测集 20 题全流程跑通；⑤ P0 验收 14 条逐项打勾 | 评测集题目文本/IO 表需提前备好 |

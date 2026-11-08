@@ -39,7 +39,9 @@ class IrParam(_Frozen):
 
 class IrAction(_Frozen):
     target: str
-    value: bool | int | float
+    # str covers identifier references (e.g. Conv_Run := Manual_Jog):
+    # the generator renders them as variable reads, literals as constants.
+    value: bool | int | float | str
 
 
 class IrState(_Frozen):
