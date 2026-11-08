@@ -5,8 +5,8 @@ from __future__ import annotations
 from plcagent.dsl import run_suite
 from plcagent.examples.d1_project import (
     D1_SPEC,
-    apply_bridge,
     build_suite,
+    d1_bridge,
     d1_generated_st,
     d1_plant,
 )
@@ -16,33 +16,13 @@ from plcagent.sta import check_ir, check_st
 
 
 def _run_d1():
-    """Full D1 chain with the plant bridge applied between scans."""
-    import plcagent.dsl as dsl
-
     st = d1_generated_st()
     suite = build_suite()
     plant_proto = d1_plant()
 
-    # wrap _one_scan to apply the bidirectional bridge around the scan:
-    # PLC outputs -> plant before physics, plant inputs -> PLC after.
-    original_one_scan = dsl._one_scan
-
-    def bridged_one_scan(interp, plant, scan_ms, never_rules, view,
-                         outcome, scan):
-        # program outputs (interpreter env, direction=="output") -> plant
-        for decl in interp.pou.decls:
-            if decl.direction == "output":
-                plant.outputs[decl.name] = interp.env.values[decl.name]
-        apply_bridge(plant)                  # PLC -> plant direction
-        original_one_scan(interp, plant, scan_ms, never_rules, view,
-                          outcome, scan)
-        apply_bridge(plant)                  # plant -> PLC direction
-
-    dsl._one_scan = bridged_one_scan
-    try:
-        return run_suite(st, suite, plant_proto, scan_ms=10, max_scans=3000)
-    finally:
-        dsl._one_scan = original_one_scan
+    # the d1 bridge hook runs both directions around each scan
+    return run_suite(st, suite, plant_proto, scan_ms=10, max_scans=3000,
+                     pre_scan=d1_bridge, post_scan=d1_bridge)
 
 
 def test_d1_spec_passes_r_rules():

@@ -10,6 +10,7 @@ trace digest.
 from __future__ import annotations
 
 import re
+from collections.abc import Callable
 from dataclasses import dataclass, field
 
 import yaml
@@ -143,13 +144,16 @@ def _require_plant_input(plant: PlantSim, signal: str, case_id: str,
 
 
 def run_suite(st_source: str, suite: dict, plant_proto: PlantSim,
-              scan_ms: int, max_scans: int = 100000) -> SuiteResult:
+              scan_ms: int, max_scans: int = 100000,
+              pre_scan: Callable | None = None,
+              post_scan: Callable | None = None) -> SuiteResult:
     """Run every case; each case gets a fresh interpreter + fresh plant."""
     suite_result = SuiteResult(suite=str(suite.get("suite", "suite")))
     recorder = TraceRecorder()
     for case in suite.get("cases", []):
         suite_result.cases.append(
-            _run_case(case, st_source, plant_proto, scan_ms, recorder, max_scans))
+            _run_case(case, st_source, plant_proto, scan_ms, recorder,
+                      max_scans, pre_scan, post_scan))
     suite_result.digest = recorder.digest()
     return suite_result
 
@@ -163,7 +167,9 @@ def _fresh_plant(proto: PlantSim) -> PlantSim:
 
 
 def _run_case(case: dict, st_source: str, plant_proto: PlantSim,
-              scan_ms: int, recorder: TraceRecorder, max_scans: int) -> CaseResult:
+              scan_ms: int, recorder: TraceRecorder, max_scans: int,
+              pre_scan: Callable | None = None,
+              post_scan: Callable | None = None) -> CaseResult:
     case_id = str(case.get("id", "case"))
     outcome = CaseResult(case_id=case_id)
     clock = VirtualClock(scan_ms=scan_ms)
@@ -239,7 +245,8 @@ def _run_case(case: dict, st_source: str, plant_proto: PlantSim,
                                window_anchors[step_index]):
                 step_index += 1
             else:
-                _one_scan(interp, plant, scan_ms, never_rules, view, outcome, scan)
+                _one_scan(interp, plant, scan_ms, never_rules, view, outcome,
+                          scan, pre_scan, post_scan)
                 scan += 1
             continue
 
@@ -256,15 +263,21 @@ def _run_case(case: dict, st_source: str, plant_proto: PlantSim,
 
 def _one_scan(interp: Interpreter, plant: PlantSim, scan_ms: int,
               never_rules: list[str], view: _SignalView,
-              outcome: CaseResult, scan: int) -> None:
+              outcome: CaseResult, scan: int,
+              pre_scan: Callable | None = None,
+              post_scan: Callable | None = None) -> None:
     """One scan cycle: interpreter -> plant physics -> invariant check."""
     # feed EVERY declared input: plant image value when bridged, otherwise
     # the variable's initialised ST default - never "unknown input" faults
     declared = interp.env.types
     plc_inputs = {name: plant.inputs.get(name, interp.env.values[name])
                   for name in declared}
+    if pre_scan is not None:
+        pre_scan(interp, plant)
     interp.run_scan(plc_inputs)
     plant.step_scan(scan_ms)
+    if post_scan is not None:
+        post_scan(interp, plant)
     for expr in never_rules:
         if _eval_expr(expr, view):
             outcome.fail(

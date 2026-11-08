@@ -112,3 +112,12 @@ def apply_bridge(plant: PlantSim) -> None:
     for source, target in OUTPUT_BRIDGE.items():
         if target is not None and source in plant.outputs:
             plant.outputs[target] = plant.outputs[source]
+
+
+def d1_bridge(interp, plant: PlantSim) -> None:
+    """Full scan bridge for sim.run: PLC outputs (interpreter env) ->
+    plant output ports before physics, plant inputs -> PLC after."""
+    for decl in interp.pou.decls:
+        if decl.direction == "output":
+            plant.outputs[decl.name] = interp.env.values[decl.name]
+    apply_bridge(plant)
