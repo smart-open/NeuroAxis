@@ -8,7 +8,7 @@
 |---|---|
 | 技术栈 | .NET 8（ASP.NET Core + WPF）+ PostgreSQL 16 + 自研 ST 子集解释器 + matIEC 兼容导出 + 本地/云 LLM 双通道 |
 | 定位 | 下位机 AI 编程（作为姊妹项目 [SmartDock](https://github.com/smart-open/SmartDock) 上位平台的 `kind: Copilot` 能力插件挂接） |
-| 文档体系 | 见下「文档导航」；`docs/design.md` 为 v1.3 全量原始设计文档（拆分前的母本） |
+| 文档体系 | 5 份顶层文档 + `docs/chapters/` 分章源文件，见下「文档导航」 |
 
 ## 三条铁律
 
@@ -25,7 +25,7 @@
 
 ## 状态
 
-设计文档阶段（v2.0 文档体系重组，2026-11-08）。修订记录：v1.0~v1.3 见 design.md；v2.0 见 [docs/chapters/98_revision-history.md](docs/chapters/98_revision-history.md)。
+设计文档阶段（v2.0 文档体系重组，2026-11-08）。修订记录（v1.0 至今）见 [docs/chapters/98_revision-history.md](docs/chapters/98_revision-history.md)。
 
 ## 文档导航（5 份顶层文档 + 分章源文件）
 
@@ -37,10 +37,10 @@
 | 4 | [docs/04_阶段验收标准.md](docs/04_阶段验收标准.md) | 每阶段验收清单（含测量方法）、验收物清单、商业交付检查表 | 验收人/QA |
 | 5 | [docs/05_测试与部署.md](docs/05_测试与部署.md) | 测试分层与 CI、部署形态、发布流程、错误处置、备份 | DevOps/QA |
 
-分章源文件在 [docs/chapters/](docs/chapters/)（按原设计文档章节拆分，编号保留原文口径使交叉引用不失效；21 章为新增的 Spec Schema 与 D1 全量样例，98/99_ 前缀为修订记录、附录与新写的实施/验收/测试细则）。
+分章源文件在 [docs/chapters/](docs/chapters/)（按章节拆分，编号保留原文口径使交叉引用不失效；21 章为新增的 Spec Schema 与 D1 全量样例，98/99_ 前缀为修订记录、附录与新写的实施/验收/测试细则）。原始 v1.3 母本 design.md 已删除，历史版本可从 git 历史追溯。
 
 ### 维护规则
 
-1. **改内容改 chapters/，再跑 `python scripts/compose_docs.py` 重新生成 5 份顶层文档**——顶层文档是生成物，不要手改。
-2. `docs/design.md` 保留为 v1.3 历史母本（只读），后续修改均在 chapters/ 中进行。
+1. **chapters/ 与 5 份顶层文档内容一致**：修改分章文件后，手动同步对应顶层文档（或恢复 `scripts/compose_docs.py` 重新生成，脚本见 git 历史 `9a99698^`）。
+2. 新增内容先进 chapters/（新章节用下一个可用编号），再同步到对应顶层文档。
 3. 跨文档引用一律写相对链接（如 `../02_技术设计.md`），不写章节号（章节号在拆分后不再唯一）。
